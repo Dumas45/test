@@ -1,3 +1,4 @@
+from collections import defaultdict
 import hashlib
 import re
 
@@ -96,7 +97,11 @@ def process(headers: dict[str, str], sep_lines: list[str], is_first: bool) -> No
 
     text = prepare_variation_text(sep_lines)
     lines = traverse_variation_text(text)
-    short_lines = set()
+
+    lines_map = defaultdict(list)
+    for line in lines:
+        short_line = trim_line(line)
+        lines_map[short_line].append(line)
 
     if is_first:
         mode = 'w'
@@ -106,9 +111,6 @@ def process(headers: dict[str, str], sep_lines: list[str], is_first: bool) -> No
     with open(OUTPUT_PATH, mode, encoding='UTF-8') as f:
         for text_line in sorted(lines):
             bar_code = get_bar_code(get_moves_part(text_line))
-
-            short_line = trim_line(text_line)
-            short_lines.add(short_line)
 
             _headers = dict(headers)
             _headers['White'] = f'{headers.get('White')} {bar_code}'
@@ -120,8 +122,12 @@ def process(headers: dict[str, str], sep_lines: list[str], is_first: bool) -> No
             f.write('\n\n')
 
     with open(OUTPUT_PATH_SHORT, mode, encoding='UTF-8') as f:
-        for short_line in sorted(short_lines):
+        for short_line in sorted(lines_map.keys()):
             bar_code = get_bar_code(get_moves_part(short_line))
+
+            long_lines = lines_map[short_line]
+            if len(long_lines) == 1:
+                short_line = long_lines[0]
 
             _headers = dict(headers)
             _headers['White'] = f'{headers.get('White')} {bar_code}'
