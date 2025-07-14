@@ -1,9 +1,20 @@
 import argparse
+import re
 
 
 def draw_fen(fen: str):
+    m = re.search(r'(?P<fen>\w+(/\w+)+)(\s(?P<side>\w))?', fen)
+    if not m:
+        raise ValueError('Invalid FEN')
+    else:
+        fen = m.group('fen')
+        side = m.group('side')
+
     res = []
-    for line in fen.split('/'):
+    parts = fen.split('/')
+    for row_idx, line in enumerate(parts):
+        top_row = row_idx == 0
+        bottom_row = row_idx == len(parts) - 1
         row = '|'
         for c in line:
             if c in '123456789':
@@ -12,7 +23,11 @@ def draw_fen(fen: str):
                 row += ' '
                 row += c
 
-        res.append(row + ' |')
+        row += ' |'
+        if top_row and side in ('b', 'B') or bottom_row and side in ('w', 'W'):
+            row += ' *'
+
+        res.append(row)
 
     return res
 
