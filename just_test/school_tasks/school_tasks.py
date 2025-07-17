@@ -1,9 +1,5 @@
 import random
 
-seed = random.randint(111, 2333444555)
-print('seed: ', seed)
-rnd = random.Random(seed)
-
 MINUS = 'minus'
 PLUS = 'plus'
 TEENS = 'teens'
@@ -19,6 +15,10 @@ def div(a):
 
 
 def just():
+    seed = random.randint(111, 2333444555)
+    print('seed: ', seed)
+    rnd = random.Random(seed)
+
     tasks = []
     while len(tasks) < 20:
         op = rnd.choice([PLUS, MINUS, TEENS])
