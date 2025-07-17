@@ -1,5 +1,5 @@
-from . import paragraphs_reader
+from . import books
 
 __all__ = [
-    "paragraphs_reader",
+    "books",
 ]

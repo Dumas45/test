@@ -4,7 +4,7 @@ import re
 
 import pytest
 
-from just_test.texts.paragraphs_reader import TextParagraphsReader
+from just_test.texts.books.prepare.paragraphs_reader import TextParagraphsReader
 
 TEST_CASES = [
     {
