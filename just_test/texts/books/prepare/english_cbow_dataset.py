@@ -116,7 +116,7 @@ class EnglishBookCBOWDatasetCreator:
     @staticmethod
     def _preprocess_text(text: str) -> str:
         text = text.lower()
-        text = re.sub(r'([.,!?])', ' \1 ', text)
+        text = re.sub(r'([.,!?])', r' \1 ', text)
         text = re.sub(r'[^\w.,!?]+', ' ', text)
         text = text.strip()
         text = re.sub(r'\s+', ' ', text)
