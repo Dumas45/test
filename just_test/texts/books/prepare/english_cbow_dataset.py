@@ -1,4 +1,3 @@
-from itertools import chain
 from pathlib import Path
 import re
 import stat
@@ -152,14 +151,17 @@ class EnglishBookCBOWDatasetCreator:
 
         # Create windows
         window_size = self.window_size
-        ngrams = [
-            list(nltk.ngrams(
+        windows = []
+        for sentence in sentences:
+            sentence_parts = sentence.split(' ')
+            if len(sentence_parts) < window_size + 1:
+                continue
+
+            for ngram in nltk.ngrams(
                 [self.MASK_TOKEN] * window_size + sentence.split(' ')
                 + [self.MASK_TOKEN] * window_size, window_size * 2 + 1
-            ))
-            for sentence in sentences
-        ]
-        windows = list(chain(*ngrams))
+            ):
+                windows.append(ngram)
 
         # Create CBOW data
         data = []
