@@ -1,5 +1,6 @@
 from itertools import chain
 from pathlib import Path
+import re
 import stat
 from typing import Callable, TextIO
 
@@ -85,7 +86,6 @@ class EnglishBookCBOWDatasetCreator:
 
                     for text in tqdm(paragraph_reader, unit=' paragraph', desc='Processing'):
                         self._process_text(text, output_file, sent_tokenize=sent_tokenize)
-                        self._header_printed = True
 
     def _create_sample_distributor(self) -> SampleDistributor:
         return SampleDistributor(
@@ -119,12 +119,25 @@ class EnglishBookCBOWDatasetCreator:
         text = ' '.join(words)
         return text.lower()
 
+    def _filter_text(self, text: str) -> bool:
+        # Discard text where there are no two consecutive letters
+        if not re.search(r'[^\W\d]{2,}', text):
+            return True
+        # Discard text where there are no two words
+        if not re.search(r'[^\W\d]\W+[^\W\d]', text):
+            return True
+
+        return False
+
     def _process_text(
             self,
             text: str,
             output_file: TextIO,
             sent_tokenize: Callable[[str], list[str]]
     ) -> None:
+        if self._filter_text(text):
+            return
+
         sample = self.sample_distributor.get_sample(len(text))
 
         # Prepare text
@@ -163,3 +176,5 @@ class EnglishBookCBOWDatasetCreator:
         # Convert to dataframe
         df = pd.DataFrame(data, columns=['context', 'target', 'split'])
         df.to_csv(output_file, index=False, header=not self._header_printed)
+
+        self._header_printed = True
