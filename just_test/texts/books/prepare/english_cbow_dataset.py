@@ -1,10 +1,10 @@
 from itertools import chain
 from pathlib import Path
-import re
 import stat
 from typing import Callable, TextIO
 
 import nltk
+from nltk.tokenize import word_tokenize
 from nltk.tokenize.punkt import PunktSentenceTokenizer
 import pandas as pd
 from tqdm import tqdm
@@ -115,12 +115,9 @@ class EnglishBookCBOWDatasetCreator:
 
     @staticmethod
     def _preprocess_text(text: str) -> str:
-        text = text.lower()
-        text = re.sub(r'([.,!?])', r' \1 ', text)
-        text = re.sub(r'[^\w.,!?]+', ' ', text)
-        text = text.strip()
-        text = re.sub(r'\s+', ' ', text)
-        return text
+        words = word_tokenize(text, preserve_line=True)
+        text = ' '.join(words)
+        return text.lower()
 
     def _process_text(
             self,
