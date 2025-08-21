@@ -25,7 +25,7 @@ class EnglishBookCBOWDatasetCreator:
 
     Attributes:
         MASK_TOKEN (str): A token used to pad the context window.
-        raw_text_path (str): Path to the raw text file to be processed.
+        raw_text_paths (list[str]): Paths to the raw text files to be processed.
         output_csv_path (str): Path to the output CSV file where the dataset will be saved.
         window_size (int): Size of the context window around the target word. Defaults to 5.
         train_ratio (float): Ratio of data to be used for training. Defaults to 0.7.
@@ -43,7 +43,7 @@ class EnglishBookCBOWDatasetCreator:
 
     def __init__(
             self,
-            raw_text_path: str,
+            raw_text_paths: list[str],
             output_csv_path: str,
             window_size: int = 5,
             train_ratio: float = 0.7,
@@ -51,7 +51,7 @@ class EnglishBookCBOWDatasetCreator:
             test_ratio: float = 0.15,
             seed: int = 1719
     ):
-        self.raw_text_path = raw_text_path
+        self.raw_text_paths = raw_text_paths
         self.output_csv_path = output_csv_path
         self.window_size = window_size
         self.train_ratio = train_ratio
@@ -78,14 +78,14 @@ class EnglishBookCBOWDatasetCreator:
         def sent_tokenize(_text: str) -> list[str]:
             return tokenizer.tokenize(_text)
 
-        with open(self.raw_text_path, 'r', encoding='UTF-8') as input_file, \
-                open(self.output_csv_path, 'w', encoding='UTF-8') as output_file:
+        with open(self.output_csv_path, 'w', encoding='UTF-8') as output_file:
+            for raw_text_path in self.raw_text_paths:
+                with open(raw_text_path, 'r', encoding='UTF-8') as input_file:
+                    paragraph_reader = TextParagraphsReader(input_file)
 
-            paragraph_reader = TextParagraphsReader(input_file)
-
-            for text in tqdm(paragraph_reader, unit=' paragraph', desc='Processing'):
-                self._process_text(text, output_file, sent_tokenize=sent_tokenize)
-                self._header_printed = True
+                    for text in tqdm(paragraph_reader, unit=' paragraph', desc='Processing'):
+                        self._process_text(text, output_file, sent_tokenize=sent_tokenize)
+                        self._header_printed = True
 
     def _create_sample_distributor(self) -> SampleDistributor:
         return SampleDistributor(
