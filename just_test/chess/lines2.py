@@ -40,17 +40,24 @@ def form_line(stack):
     return ' '.join(moves)
 
 
+def split_moves_part(line: str) -> tuple[str, str]:
+    m = re.search(r'(?P<moves>((\s+)?(\d+)?\w+\S?)+)\s*(?P<suffix>.*)?', line)
+    if m is None:
+        raise ValueError('Invalid line does not match the pattern')
+
+    return m.group('moves'), m.group('suffix')
+
+
 def get_moves_part(line: str) -> str:
-    m = re.search(r'(?P<moves>((\s+)?(\d+)?\w+\S?)+)\s*(?P<suffix>.*)?', line)
-    return m.group('moves')
+    moves, _ = split_moves_part(line)
+    return moves
 
 
-def trim_line(line: str) -> str:
-    m = re.search(r'(?P<moves>((\s+)?(\d+)?\w+\S?)+)\s*(?P<suffix>.*)?', line)
-    parts = re.findall(r'\S+', m.group('moves'))
-    trim = 24 if len(parts) % 2 == 0 else 23
+def trim_line(line: str, move: int) -> str:
+    moves, suffix = split_moves_part(line)
+    parts = re.findall(r'\S+', moves)
+    trim = move * 2 if len(parts) % 2 == 0 else move * 2 - 1
     parts = parts[:trim]
-    suffix = m.group('suffix')
     if suffix:
         parts.append(suffix)
 
@@ -100,7 +107,7 @@ def process(headers: dict[str, str], sep_lines: list[str], is_first: bool) -> No
 
     lines_map = defaultdict(list)
     for line in lines:
-        short_line = trim_line(line)
+        short_line = trim_line(line, move=8)
         lines_map[short_line].append(line)
 
     if is_first:
