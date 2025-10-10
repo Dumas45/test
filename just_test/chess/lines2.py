@@ -132,10 +132,6 @@ def process(headers: dict[str, str], sep_lines: list[str], is_first: bool) -> No
         for short_line in sorted(lines_map.keys()):
             bar_code = get_bar_code(get_moves_part(short_line))
 
-            long_lines = lines_map[short_line]
-            if len(long_lines) == 1:
-                short_line = long_lines[0]
-
             _headers = dict(headers)
             _headers['White'] = f'{headers.get('White')} {bar_code}'
             for k, v in _headers.items():
