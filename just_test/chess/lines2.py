@@ -8,9 +8,9 @@ OUTPUT_PATH_SHORT = '/home/alex/data/chess/lines-short.pgn'
 
 
 def get_letter(s: str) -> str:
-    vocab = 'BARCELONA'
+    vocab = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     h = hashlib.new('sm3', s.encode())
-    idx = sum(h.digest()[-4:]) % len(vocab)
+    idx = sum(h.digest()[-7:]) % len(vocab)
     return vocab[idx]
 
 
