@@ -20,12 +20,34 @@ import secrets
 from typing import Optional
 
 
-def parse_line(line: str) -> Optional[tuple[str, str]]:
-    m = re.fullmatch(r'\s*(\d+\.\s+)([^\[].+\S)\s*', line)
+class QuestionNumberGenerator:
+    def __init__(self):
+        self.current = 0
+        self._set = set()
+
+    def next(self, number: str) -> str:
+        if not number:
+            self.current += 1
+            number = f'{self.current:03d}'
+        else:
+            number = f'{int(number):03d}'
+
+        res = number
+        c = 1
+        while res in self._set:
+            c += 1
+            res = f'{number}_{c:x}'
+
+        self._set.add(res)
+        return res
+
+
+def parse_line(line: str) -> Optional[dict]:
+    m = re.fullmatch(r'\s*(?P<pref>(?:(?:(?P<number>\d+)\.)|\*)\s+)(?P<question>[^\[].+\S)\s*', line)
     if m is None:
         return None
     else:
-        return m.group(1), m.group(2)
+        return m.groupdict()
 
 
 def create_blank_files(file_path: Path, subfolder_path: Path, name: str):
@@ -52,6 +74,7 @@ def create_blank_files(file_path: Path, subfolder_path: Path, name: str):
 
     # Process each question
     processed = 0
+    qn_generator = QuestionNumberGenerator()
     with open(file_path.parent / name, 'w') as fp:
         for line in lines:
             line = line.rstrip()
@@ -60,8 +83,14 @@ def create_blank_files(file_path: Path, subfolder_path: Path, name: str):
                 fp.write(line)
                 fp.write(os.linesep)
             else:
-                pref, question = line_parts
-                qf_name = f'question_{secrets.token_hex(4)}.md'
+                pref = line_parts['pref']
+                question = line_parts['question']
+                number = line_parts['number']
+                qn = qn_generator.next(number)
+                if not number:
+                    pref = f'{qn}. '
+
+                qf_name = f'question_{qn}.md'
                 qf_path = rel_subfolder_path / qf_name
 
                 # Update question line
