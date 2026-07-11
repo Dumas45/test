@@ -1,25 +1,19 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "just_test"
-version = "101.1"
+version = "102.1"
 description = "Just a test"
 readme = "README.md"
-requires-python = ">=3.11"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib==3.11.0",
+    "nltk==3.10.0",
+    "numpy==2.5.1",
+    "pandas==3.0.3",
+    "tqdm==4.68.4",
 ]
 
-[project.license]
-text = "Unlicense"
-files = ["LICENSE"]
-
-[tool.setuptools.packages.find]
-include = ["just_test"]
-exclude = ["just_test.tests*"]
-
-[tool.setuptools.exclude-package-data]
-"*" = ["tests/*"]
+[dependency-groups]
+dev = [
+    "pylint==4.0.6",
+    "pytest==9.1.1",
+]
