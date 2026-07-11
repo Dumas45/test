@@ -1,2 +1,2 @@
 #!/bin/bash
-source ../Envs/test/bin/activate
+source .venv/bin/activate
